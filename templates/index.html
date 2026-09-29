@@ -123,149 +123,51 @@
 
         </div>
 
+       <!-- Static Analysis -->
+<div class="result-card">
 
-        <!-- Static Analysis -->
-        <div class="result-card">
+    <h3>3. Static Analysis</h3>
 
-            <h3>3. Static Analysis</h3>
+    {% for issue_type, issue in result.static.items() %}
 
+        <div class="issue-section">
 
-            <h4>Unused Variables</h4>
+            <h4>{{ issue.explanation.title }}</h4>
 
-            {% if result.static.unused_variables %}
+            {% if issue.findings %}
 
                 <div class="issue">
-                    ⚠️ {{ result.static.unused_variables }}
+                    ⚠️ Issue detected
                 </div>
 
-            {% else %}
-
-                <p class="success">
-                    ✅ No unused variables found.
+                <p>
+                    <strong>Description:</strong>
+                    {{ issue.explanation.description }}
                 </p>
 
-            {% endif %}
-
-
-            <h4>Unused Imports</h4>
-
-            {% if result.static.unused_imports %}
-
-                <div class="issue">
-                    ⚠️ {{ result.static.unused_imports }}
-                </div>
-
-            {% else %}
-
-                <p class="success">
-                    ✅ No unused imports found.
+                <p>
+                    <strong>Findings:</strong>
+                    {{ issue.findings }}
                 </p>
 
-            {% endif %}
-
-
-            <h4>Mutable Default Arguments</h4>
-
-            {% if result.static.mutable_defaults %}
-
-                <div class="issue">
-                    ⚠️ {{ result.static.mutable_defaults }}
-                </div>
-
-            {% else %}
-
-                <p class="success">
-                    ✅ No mutable default arguments found.
+                <p>
+                    <strong>Suggested Fix:</strong>
+                    {{ issue.explanation.suggestion }}
                 </p>
 
-            {% endif %}
-
-
-            <h4>Bare Except</h4>
-
-            {% if result.static.bare_except %}
-
-                <div class="issue">
-                    ⚠️ {{ result.static.bare_except }}
-                </div>
-
             {% else %}
 
                 <p class="success">
-                    ✅ No bare except blocks found.
-                </p>
-
-            {% endif %}
-
-
-            <h4>Undefined Variables</h4>
-
-            {% if result.static.undefined_variables %}
-
-                <div class="issue">
-                    ⚠️ {{ result.static.undefined_variables }}
-                </div>
-
-            {% else %}
-
-                <p class="success">
-                    ✅ No undefined variables found.
-                </p>
-
-            {% endif %}
-
-
-            <h4>Dangerous eval()</h4>
-
-            {% if result.static.dangerous_eval %}
-
-                <div class="issue">
-                    ⚠️ {{ result.static.dangerous_eval }}
-                </div>
-
-            {% else %}
-
-                <p class="success">
-                    ✅ No dangerous eval() usage found.
-                </p>
-
-            {% endif %}
-
-
-            <h4>Division by Zero</h4>
-
-            {% if result.static.division_by_zero %}
-
-                <div class="issue">
-                    ⚠️ {{ result.static.division_by_zero }}
-                </div>
-
-            {% else %}
-
-                <p class="success">
-                    ✅ No division by zero detected.
-                </p>
-
-            {% endif %}
-
-
-            <h4>Unreachable Code</h4>
-
-            {% if result.static.unreachable_code %}
-
-                <div class="issue">
-                    ⚠️ {{ result.static.unreachable_code }}
-                </div>
-
-            {% else %}
-
-                <p class="success">
-                    ✅ No unreachable code found.
+                    ✅ No issues detected.
                 </p>
 
             {% endif %}
 
         </div>
+
+    {% endfor %}
+
+</div>
 
 
         <!-- Runtime Analysis -->

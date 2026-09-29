@@ -11,6 +11,7 @@ from analyzers.static_analyzer import (
     find_unreachable_code
 )
 from analyzers.runtime_analyzer import analyze_runtime
+from analyzers.explanation_engine import get_explanation
 
 
 def analyze_code(code):
@@ -22,11 +23,10 @@ def analyze_code(code):
         "runtime": None
     }
 
-    # Stop here if syntax is invalid
     if result["syntax"]["has_error"]:
         return result
 
-    result["static"] = {
+    static_results = {
         "unused_variables": find_unused_variables(code),
         "unused_imports": find_unused_imports(code),
         "mutable_defaults": find_mutable_defaults(code),
@@ -36,6 +36,14 @@ def analyze_code(code):
         "division_by_zero": find_division_by_zero(code),
         "unreachable_code": find_unreachable_code(code)
     }
+
+    result["static"] = {}
+
+    for issue_type, findings in static_results.items():
+        result["static"][issue_type] = {
+            "findings": findings,
+            "explanation": get_explanation(issue_type)
+        }
 
     result["runtime"] = analyze_runtime(code)
 
