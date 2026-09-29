@@ -42,6 +42,9 @@
             <button type="submit">
                 Analyze Code
             </button>
+            <button type="button" onclick="clearCode()">
+                Clear Code
+            </button>
 
         </form>
 
@@ -54,19 +57,36 @@
 
     <h2>Analysis Results</h2>
 
-    <div class="result-card">
-        <h3>Issue Summary</h3>
+<div class="result-card">
+    <h3>Issue Summary</h3>
 
-        {% if result.summary.total_static_issues == 0 %}
-            <p class="success">
-                ✅ No static issues detected.
-            </p>
-        {% else %}
-            <p class="warning">
-                ⚠️ {{ result.summary.total_static_issues }} static issue(s) detected.
-            </p>
-        {% endif %}
+    <div class="summary-grid">
+
+        <div class="summary-item">
+            <h4>Static Issues</h4>
+            <p>{{ result.summary.total_static_issues }}</p>
+        </div>
+
+        <div class="summary-item">
+            <h4>Syntax</h4>
+            {% if result.syntax.has_error %}
+                <p class="error">Error</p>
+            {% else %}
+                <p class="success">No Errors</p>
+            {% endif %}
+        </div>
+
+        <div class="summary-item">
+            <h4>Runtime</h4>
+            {% if result.runtime and result.runtime.has_error %}
+                <p class="error">{{ result.runtime.error_type }}</p>
+            {% else %}
+                <p class="success">No Errors</p>
+            {% endif %}
+        </div>
+
     </div>
+</div>
 
     <!-- Syntax -->
     <div class="result-card">
@@ -220,6 +240,17 @@
     {% endif %}
 
 </div>
+<script>
+    function clearCode() {
+        document.getElementById("code").value = "";
+
+        const results = document.querySelector(".result-section");
+
+        if (results) {
+            results.remove();
+        }
+    }
+</script>
 
 </body>
 </html>
