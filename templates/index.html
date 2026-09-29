@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,12 +19,13 @@
         <p>Intelligent Python Bug Analysis and Error Detection System</p>
     </header>
 
+
     <!-- Code Input -->
     <div class="code-section">
 
         <h2>Python Code Analyzer</h2>
 
-        <form method="POST">
+        <form method="POST" onsubmit="showLoading(); return true;">
 
             <label for="code">
                 Enter your Python code:
@@ -31,18 +33,31 @@
 
             <br><br>
 
-            <textarea
-                id="code"
-                name="code"
-                placeholder="Write or paste your Python code here..."
-            >{{ code }}</textarea>
+            <div class="editor-container">
+
+                <div id="line-numbers">1</div>
+
+                <textarea
+                    id="code"
+                    name="code"
+                    placeholder="Write or paste your Python code here..."
+                    oninput="updateLineNumbers()"
+                    onscroll="syncLineNumbers()"
+                >{{ code }}</textarea>
+
+            </div>
 
             <br>
 
-            <button type="submit">
+            <button type="submit" class="analyze-btn">
                 Analyze Code
             </button>
-            <button type="button" onclick="clearCode()">
+
+            <button
+                type="button"
+                class="clear-btn"
+                onclick="clearCode()"
+            >
                 Clear Code
             </button>
 
@@ -53,44 +68,71 @@
 
     {% if result %}
 
+    <!-- Results -->
     <div class="result-section">
 
-    <h2>Analysis Results</h2>
+        <h2>Analysis Results</h2>
 
-<div class="result-card">
-    <h3>Issue Summary</h3>
 
-    <div class="summary-grid">
+        <!-- Issue Summary -->
+        <div class="result-card">
 
-        <div class="summary-item">
-            <h4>Static Issues</h4>
-            <p>{{ result.summary.total_static_issues }}</p>
+            <h3>Issue Summary</h3>
+
+            <div class="summary-grid">
+
+                <div class="summary-item">
+                    <h4>Static Issues</h4>
+                    <p>{{ result.summary.total_static_issues }}</p>
+                </div>
+
+
+                <div class="summary-item">
+                    <h4>Syntax</h4>
+
+                    {% if result.syntax.has_error %}
+
+                        <p class="error">
+                            Error
+                        </p>
+
+                    {% else %}
+
+                        <p class="success">
+                            No Errors
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="summary-item">
+                    <h4>Runtime</h4>
+
+                    {% if result.runtime and result.runtime.has_error %}
+
+                        <p class="error">
+                            {{ result.runtime.error_type }}
+                        </p>
+
+                    {% else %}
+
+                        <p class="success">
+                            No Errors
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="summary-item">
-            <h4>Syntax</h4>
-            {% if result.syntax.has_error %}
-                <p class="error">Error</p>
-            {% else %}
-                <p class="success">No Errors</p>
-            {% endif %}
-        </div>
 
-        <div class="summary-item">
-            <h4>Runtime</h4>
-            {% if result.runtime and result.runtime.has_error %}
-                <p class="error">{{ result.runtime.error_type }}</p>
-            {% else %}
-                <p class="success">No Errors</p>
-            {% endif %}
-        </div>
-
-    </div>
-</div>
-
-    <!-- Syntax -->
-    <div class="result-card">
-        ...
+        <!-- Syntax Analysis -->
+        <div class="result-card">
 
             <h3>1. Syntax Analysis</h3>
 
@@ -126,7 +168,7 @@
         </div>
 
 
-        <!-- AST -->
+        <!-- AST Analysis -->
         <div class="result-card">
 
             <h3>2. AST Analysis</h3>
@@ -156,51 +198,54 @@
 
         </div>
 
-       <!-- Static Analysis -->
-<div class="result-card">
 
-    <h3>3. Static Analysis</h3>
+        <!-- Static Analysis -->
+        <div class="result-card">
 
-    {% for issue_type, issue in result.static.items() %}
+            <h3>3. Static Analysis</h3>
 
-        <div class="issue-section">
+            {% for issue_type, issue in result.static.items() %}
 
-            <h4>{{ issue.explanation.title }}</h4>
+                <div class="issue-section">
 
-            {% if issue.findings %}
+                    <h4>
+                        {{ issue.explanation.title }}
+                    </h4>
 
-                <div class="issue">
-                    ⚠️ Issue detected
+                    {% if issue.findings %}
+
+                        <div class="issue">
+                            ⚠️ Issue detected
+                        </div>
+
+                        <p>
+                            <strong>Description:</strong>
+                            {{ issue.explanation.description }}
+                        </p>
+
+                        <p>
+                            <strong>Findings:</strong>
+                            {{ issue.findings }}
+                        </p>
+
+                        <p>
+                            <strong>Suggested Fix:</strong>
+                            {{ issue.explanation.suggestion }}
+                        </p>
+
+                    {% else %}
+
+                        <p class="success">
+                            ✅ No issues detected.
+                        </p>
+
+                    {% endif %}
+
                 </div>
 
-                <p>
-                    <strong>Description:</strong>
-                    {{ issue.explanation.description }}
-                </p>
-
-                <p>
-                    <strong>Findings:</strong>
-                    {{ issue.findings }}
-                </p>
-
-                <p>
-                    <strong>Suggested Fix:</strong>
-                    {{ issue.explanation.suggestion }}
-                </p>
-
-            {% else %}
-
-                <p class="success">
-                    ✅ No issues detected.
-                </p>
-
-            {% endif %}
+            {% endfor %}
 
         </div>
-
-    {% endfor %}
-
-</div>
 
 
         <!-- Runtime Analysis -->
@@ -240,8 +285,12 @@
     {% endif %}
 
 </div>
+
+
 <script>
+
     function clearCode() {
+
         document.getElementById("code").value = "";
 
         const results = document.querySelector(".result-section");
@@ -249,8 +298,48 @@
         if (results) {
             results.remove();
         }
+
+        updateLineNumbers();
     }
+
+
+    function updateLineNumbers() {
+
+        const code = document.getElementById("code");
+        const lineNumbers = document.getElementById("line-numbers");
+
+        const lines = code.value.split("\n").length;
+
+        lineNumbers.innerHTML = "";
+
+        for (let i = 1; i <= lines; i++) {
+            lineNumbers.innerHTML += i + "<br>";
+        }
+    }
+
+
+    function syncLineNumbers() {
+
+        const code = document.getElementById("code");
+        const lineNumbers = document.getElementById("line-numbers");
+
+        lineNumbers.scrollTop = code.scrollTop;
+    }
+
+
+    function showLoading() {
+
+        const button = document.querySelector(".analyze-btn");
+
+        button.disabled = true;
+        button.textContent = "Analyzing...";
+    }
+
+
+    updateLineNumbers();
+
 </script>
+
 
 </body>
 </html>
