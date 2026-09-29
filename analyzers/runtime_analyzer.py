@@ -2,6 +2,7 @@ import subprocess
 import sys
 import tempfile
 import os
+import re
 
 
 def analyze_runtime(code):
@@ -29,22 +30,46 @@ def analyze_runtime(code):
                 "has_error": False,
                 "error_type": None,
                 "message": "Code executed successfully.",
-                "output": result.stdout
+                "output": result.stdout,
+                "line_number": None,
+                "source_line": None
             }
 
-        error_lines = result.stderr.strip().splitlines()
+        error_message = result.stderr.strip()
 
+        # Extract the line number from the traceback
+        line_number = None
+
+        match = re.search(r'line (\d+)', error_message)
+
+        if match:
+            line_number = int(match.group(1))
+
+        # Extract the actual error type
         error_type = "RuntimeError"
+
+        error_lines = error_message.splitlines()
 
         if error_lines:
             last_line = error_lines[-1]
             error_type = last_line.split(":")[0]
 
+        # Get the source line that caused the error
+        source_line = None
+
+        if line_number is not None:
+            code_lines = code.splitlines()
+
+            if 1 <= line_number <= len(code_lines):
+                source_line = code_lines[line_number - 1].strip()
+
         return {
             "has_error": True,
             "error_type": error_type,
-            "message": result.stderr.strip(),
-            "output": result.stdout
+            "message": error_message,
+            "output": result.stdout,
+            "line_number": line_number,
+            "source_line": source_line
         }
 
     except subprocess.TimeoutExpired:
@@ -52,7 +77,9 @@ def analyze_runtime(code):
             "has_error": True,
             "error_type": "TimeoutError",
             "message": "Code execution exceeded the 5-second limit.",
-            "output": ""
+            "output": "",
+            "line_number": None,
+            "source_line": None
         }
 
     finally:

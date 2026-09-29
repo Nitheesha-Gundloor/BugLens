@@ -26,6 +26,21 @@ print(x / y)
     assert result["has_error"] is True
     assert result["error_type"] == "ZeroDivisionError"
 
+def test_runtime_error_location():
+    code = """
+x = 10
+y = 0
+print(x / y)
+"""
+
+    result = analyze_runtime(code)
+
+    assert result["has_error"] is True
+    assert result["error_type"] == "ZeroDivisionError"
+    assert result["line_number"] == 4
+    assert result["source_line"] == "print(x / y)"
+
+
 
 def test_timeout():
     code = """
