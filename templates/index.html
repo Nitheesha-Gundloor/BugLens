@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BugLens - Python Bug Analyzer</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <header>
+        <h1>BugLens</h1>
+        <p>Intelligent Python Bug Analysis and Error Detection System</p>
+    </header>
+
+    <!-- Code Input -->
+    <div class="code-section">
+
+        <h2>Python Code Analyzer</h2>
+
+        <form method="POST">
+
+            <label for="code">
+                Enter your Python code:
+            </label>
+
+            <br><br>
+
+            <textarea
+                id="code"
+                name="code"
+                placeholder="Write or paste your Python code here..."
+            >{{ code }}</textarea>
+
+            <br>
+
+            <button type="submit">
+                Analyze Code
+            </button>
+
+        </form>
+
+    </div>
+
+
+    {% if result %}
+
+    <!-- Results -->
+    <div class="result-section">
+
+        <h2>Analysis Results</h2>
+
+
+        <!-- Syntax -->
+        <div class="result-card">
+
+            <h3>1. Syntax Analysis</h3>
+
+            {% if result.syntax.has_error %}
+
+                <p class="error">
+                    ❌ Syntax Error
+                </p>
+
+                <p>
+                    <strong>Message:</strong>
+                    {{ result.syntax.message }}
+                </p>
+
+                <p>
+                    <strong>Line:</strong>
+                    {{ result.syntax.line }}
+                </p>
+
+                <p>
+                    <strong>Column:</strong>
+                    {{ result.syntax.column }}
+                </p>
+
+            {% else %}
+
+                <p class="success">
+                    ✅ No syntax errors found.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- AST -->
+        <div class="result-card">
+
+            <h3>2. AST Analysis</h3>
+
+            {% if result.ast.success %}
+
+                <p class="success">
+                    ✅ AST analysis completed successfully.
+                </p>
+
+                <p>
+                    <strong>AST Nodes:</strong>
+                    {{ result.ast.node_count }}
+                </p>
+
+            {% else %}
+
+                <p class="error">
+                    ❌ AST analysis failed.
+                </p>
+
+                <p>
+                    {{ result.ast.message }}
+                </p>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- Static Analysis -->
+        <div class="result-card">
+
+            <h3>3. Static Analysis</h3>
+
+
+            <h4>Unused Variables</h4>
+
+            {% if result.static.unused_variables %}
+
+                <div class="issue">
+                    ⚠️ {{ result.static.unused_variables }}
+                </div>
+
+            {% else %}
+
+                <p class="success">
+                    ✅ No unused variables found.
+                </p>
+
+            {% endif %}
+
+
+            <h4>Unused Imports</h4>
+
+            {% if result.static.unused_imports %}
+
+                <div class="issue">
+                    ⚠️ {{ result.static.unused_imports }}
+                </div>
+
+            {% else %}
+
+                <p class="success">
+                    ✅ No unused imports found.
+                </p>
+
+            {% endif %}
+
+
+            <h4>Mutable Default Arguments</h4>
+
+            {% if result.static.mutable_defaults %}
+
+                <div class="issue">
+                    ⚠️ {{ result.static.mutable_defaults }}
+                </div>
+
+            {% else %}
+
+                <p class="success">
+                    ✅ No mutable default arguments found.
+                </p>
+
+            {% endif %}
+
+
+            <h4>Bare Except</h4>
+
+            {% if result.static.bare_except %}
+
+                <div class="issue">
+                    ⚠️ {{ result.static.bare_except }}
+                </div>
+
+            {% else %}
+
+                <p class="success">
+                    ✅ No bare except blocks found.
+                </p>
+
+            {% endif %}
+
+
+            <h4>Undefined Variables</h4>
+
+            {% if result.static.undefined_variables %}
+
+                <div class="issue">
+                    ⚠️ {{ result.static.undefined_variables }}
+                </div>
+
+            {% else %}
+
+                <p class="success">
+                    ✅ No undefined variables found.
+                </p>
+
+            {% endif %}
+
+
+            <h4>Dangerous eval()</h4>
+
+            {% if result.static.dangerous_eval %}
+
+                <div class="issue">
+                    ⚠️ {{ result.static.dangerous_eval }}
+                </div>
+
+            {% else %}
+
+                <p class="success">
+                    ✅ No dangerous eval() usage found.
+                </p>
+
+            {% endif %}
+
+
+            <h4>Division by Zero</h4>
+
+            {% if result.static.division_by_zero %}
+
+                <div class="issue">
+                    ⚠️ {{ result.static.division_by_zero }}
+                </div>
+
+            {% else %}
+
+                <p class="success">
+                    ✅ No division by zero detected.
+                </p>
+
+            {% endif %}
+
+
+            <h4>Unreachable Code</h4>
+
+            {% if result.static.unreachable_code %}
+
+                <div class="issue">
+                    ⚠️ {{ result.static.unreachable_code }}
+                </div>
+
+            {% else %}
+
+                <p class="success">
+                    ✅ No unreachable code found.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- Runtime Analysis -->
+        <div class="result-card">
+
+            <h3>4. Runtime Analysis</h3>
+
+            {% if result.runtime.has_error %}
+
+                <p class="error">
+                    ❌ {{ result.runtime.error_type }}
+                </p>
+
+                <pre>{{ result.runtime.message }}</pre>
+
+            {% else %}
+
+                <p class="success">
+                    ✅ Code executed successfully.
+                </p>
+
+            {% endif %}
+
+
+            {% if result.runtime.output %}
+
+                <h4>Program Output</h4>
+
+                <pre>{{ result.runtime.output }}</pre>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>
