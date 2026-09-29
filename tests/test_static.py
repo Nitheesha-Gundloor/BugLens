@@ -6,6 +6,7 @@ from analyzers.static_analyzer import find_undefined_variables
 from analyzers.static_analyzer import find_dangerous_eval
 from analyzers.static_analyzer import find_division_by_zero
 from analyzers.static_analyzer import find_unreachable_code
+from analyzers.static_analyzer import find_none_comparison
 
 def test_unused_variable():
     code = """
@@ -190,3 +191,60 @@ def calculate():
     result = find_unreachable_code(code)
 
     assert result == []
+def test_ignore_throwaway_variable():
+    code = """
+_ = 10
+x = 20
+
+print(x)
+"""
+
+    result = find_unused_variables(code)
+
+    assert "_" not in result
+def test_defined_local_variable():
+    code = """
+def greet():
+    name = "Nitheesha"
+    print(name)
+"""
+
+    result = find_undefined_variables(code)
+
+    assert "name" not in result
+
+
+def test_undefined_local_variable():
+    code = """
+def greet():
+    print(username)
+"""
+
+    result = find_undefined_variables(code)
+
+    assert "username" in result
+def test_none_comparison():
+    code = """
+value = None
+
+if value == None:
+    print("No value")
+"""
+
+    result = find_none_comparison(code)
+
+    assert len(result) == 1
+    assert result[0]["line"] == 4
+
+
+def test_none_comparison_is_allowed():
+    code = """
+value = None
+
+if value is None:
+    print("No value")
+"""
+
+    result = find_none_comparison(code)
+
+    assert len(result) == 0

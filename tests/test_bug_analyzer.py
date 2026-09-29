@@ -45,3 +45,18 @@ print(x
     assert result["syntax"]["has_error"] is True
     assert result["static"] == {}
     assert result["runtime"] is None
+
+
+def test_none_comparison_in_complete_analysis():
+    code = """
+value = None
+
+if value == None:
+    print("No value")
+"""
+
+    result = analyze_code(code)
+
+    assert result["syntax"]["has_error"] is False
+    assert len(result["static"]["none_comparison"]["findings"]) == 1
+    assert result["static"]["none_comparison"]["explanation"]["title"] == "None Comparison"

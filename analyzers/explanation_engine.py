@@ -45,6 +45,11 @@ EXPLANATIONS = {
         "title": "Unreachable Code",
         "description": "This code appears after a return, raise, break, or continue statement and may never execute.",
         "suggestion": "Remove the unreachable statements or move them before the control-flow statement."
+    },
+    "none_comparison": {
+    "title": "None Comparison",
+    "description": "The code compares a value with None using == or != instead of the identity operators is or is not.",
+    "suggestion": "Use 'is None' or 'is not None' when checking whether a value is None."
     }
 }
 

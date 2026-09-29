@@ -19,4 +19,12 @@ def test_unused_variable_explanation():
 def test_unknown_issue():
     result = get_explanation("unknown_issue")
 
-    assert result["title"] == "Unknown Issue"
+    assert result["title"] == "Unknown Issue"\
+
+    
+def test_none_comparison_explanation():
+    result = get_explanation("none_comparison")
+
+    assert result["title"] == "None Comparison"
+    assert "None" in result["description"]
+    assert "is None" in result["suggestion"]
