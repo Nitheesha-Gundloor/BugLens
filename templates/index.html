@@ -50,14 +50,27 @@
 
     {% if result %}
 
-    <!-- Results -->
     <div class="result-section">
 
-        <h2>Analysis Results</h2>
+    <h2>Analysis Results</h2>
 
+    <div class="result-card">
+        <h3>Issue Summary</h3>
 
-        <!-- Syntax -->
-        <div class="result-card">
+        {% if result.summary.total_static_issues == 0 %}
+            <p class="success">
+                ✅ No static issues detected.
+            </p>
+        {% else %}
+            <p class="warning">
+                ⚠️ {{ result.summary.total_static_issues }} static issue(s) detected.
+            </p>
+        {% endif %}
+    </div>
+
+    <!-- Syntax -->
+    <div class="result-card">
+        ...
 
             <h3>1. Syntax Analysis</h3>
 

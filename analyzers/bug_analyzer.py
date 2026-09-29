@@ -20,12 +20,17 @@ def analyze_code(code):
         "syntax": analyze_syntax(code),
         "ast": analyze_ast(code),
         "static": {},
-        "runtime": None
+        "runtime": None,
+        "summary": {
+            "total_static_issues": 0
+        }
     }
 
+    # Stop analysis if syntax is invalid
     if result["syntax"]["has_error"]:
         return result
 
+    # Run all static analysis rules
     static_results = {
         "unused_variables": find_unused_variables(code),
         "unused_imports": find_unused_imports(code),
@@ -37,14 +42,22 @@ def analyze_code(code):
         "unreachable_code": find_unreachable_code(code)
     }
 
-    result["static"] = {}
-
+    # Add findings and explanations
     for issue_type, findings in static_results.items():
         result["static"][issue_type] = {
             "findings": findings,
             "explanation": get_explanation(issue_type)
         }
 
+    # Calculate total number of static issues
+    total_static_issues = sum(
+        len(issue["findings"])
+        for issue in result["static"].values()
+    )
+
+    result["summary"]["total_static_issues"] = total_static_issues
+
+    # Run code for runtime analysis
     result["runtime"] = analyze_runtime(code)
 
     return result

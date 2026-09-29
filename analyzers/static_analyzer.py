@@ -1,5 +1,5 @@
 import ast
-
+import builtins
 
 def find_unused_variables(code):
     tree = ast.parse(code)
@@ -74,3 +74,99 @@ def find_bare_except(code):
                 })
 
     return bare_excepts
+def find_undefined_variables(code):
+    tree = ast.parse(code)
+
+    defined_variables = set()
+    used_variables = set()
+
+    for node in ast.walk(tree):
+
+        if isinstance(node, ast.Name):
+            if isinstance(node.ctx, ast.Store):
+                defined_variables.add(node.id)
+
+            elif isinstance(node.ctx, ast.Load):
+                used_variables.add(node.id)
+
+        elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            for arg in node.args.args:
+                defined_variables.add(arg.arg)
+
+            for arg in node.args.posonlyargs:
+                defined_variables.add(arg.arg)
+
+            for arg in node.args.kwonlyargs:
+                defined_variables.add(arg.arg)
+
+            if node.args.vararg:
+                defined_variables.add(node.args.vararg.arg)
+
+            if node.args.kwarg:
+                defined_variables.add(node.args.kwarg.arg)
+
+    builtin_names = set(dir(builtins))
+
+    undefined_variables = (
+        used_variables
+        - defined_variables
+        - builtin_names
+    )
+
+    return list(undefined_variables)
+def find_dangerous_eval(code):
+    tree = ast.parse(code)
+
+    dangerous_calls = []
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            if isinstance(node.func, ast.Name) and node.func.id == "eval":
+                dangerous_calls.append({
+                    "line": node.lineno
+                })
+
+    return dangerous_calls
+def find_division_by_zero(code):
+    tree = ast.parse(code)
+
+    division_errors = []
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.BinOp):
+            if isinstance(node.op, (ast.Div, ast.FloorDiv, ast.Mod)):
+                if isinstance(node.right, ast.Constant) and node.right.value == 0:
+                    division_errors.append({
+                        "line": node.lineno
+                    })
+
+    return division_errors
+def find_unreachable_code(code):
+    tree = ast.parse(code)
+
+    unreachable_lines = []
+
+    for node in ast.walk(tree):
+        statements = []
+
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            statements = node.body
+
+        elif isinstance(node, (ast.For, ast.While)):
+            statements = node.body
+
+        elif isinstance(node, ast.If):
+            statements = node.body
+
+        for index, statement in enumerate(statements):
+            if isinstance(
+                statement,
+                (ast.Return, ast.Raise, ast.Break, ast.Continue)
+            ):
+                for unreachable in statements[index + 1:]:
+                    unreachable_lines.append({
+                        "line": unreachable.lineno
+                    })
+                break
+
+    return unreachable_lines
