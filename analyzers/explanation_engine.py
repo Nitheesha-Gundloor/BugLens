@@ -51,6 +51,11 @@ EXPLANATIONS = {
         "description": "The program attempted to use a variable or name that Python could not find during execution.",
         "suggestion": "Make sure the variable is defined before use and check for spelling mistakes."
     },
+    "type_error": {
+        "title": "Type Error at Runtime",
+        "description": "The program performed an operation using incompatible data types during execution.",
+        "suggestion": "Check the data types involved and convert them to compatible types before performing the operation."
+    },
 
     "unreachable_code": {
         "title": "Unreachable Code",

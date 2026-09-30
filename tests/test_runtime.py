@@ -56,3 +56,16 @@ while True:
     assert result["has_error"] is True
     assert result["error_type"] == "TimeoutError"
     assert result["issue_type"] == "timeout_error"
+
+def test_type_error():
+    code = """
+x = 10
+print(x + "hello")
+"""
+
+    result = analyze_runtime(code)
+
+    assert result["has_error"] is True
+    assert result["error_type"] == "TypeError"
+    assert result["issue_type"] == "type_error"
+    assert result["source_line"] == 'print(x + "hello")'

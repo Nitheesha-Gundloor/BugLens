@@ -79,3 +79,19 @@ print(x / y)
     assert result["runtime"]["explanation"]["title"] == "Zero Division Error"
     assert "divide" in result["runtime"]["explanation"]["description"]
     assert "divisor" in result["runtime"]["explanation"]["suggestion"]
+
+def test_type_error_explanation():
+    code = """
+x = 10
+print(x + "hello")
+"""
+
+    result = analyze_code(code)
+
+    assert result["runtime"]["has_error"] is True
+    assert result["runtime"]["error_type"] == "TypeError"
+    assert result["runtime"]["issue_type"] == "type_error"
+    assert result["runtime"]["line_number"] == 3
+    assert result["runtime"]["source_line"] == 'print(x + "hello")'
+
+    assert result["runtime"]["explanation"]["title"] == "Type Error at Runtime"

@@ -7,7 +7,8 @@ import re
 
 RUNTIME_ERROR_MAPPING = {
     "ZeroDivisionError": "zero_division_error",
-    "NameError": "name_error"
+    "NameError": "name_error",
+    "TypeError": "type_error"
 }
 
 
