@@ -256,44 +256,81 @@
 
             </div>
 
-
             <!-- Runtime Analysis -->
-            <div class="result-card">
+<div class="result-card">
 
-                <h3>4. Runtime Analysis</h3>
+    <h3>4. Runtime Analysis</h3>
 
-                {% if result.runtime.has_error %}
+    {% if result.runtime.has_error %}
 
-                <p class="error">
-                    ❌ {{ result.runtime.error_type }}
-                </p>
+    <p class="error">
+        ❌ {{ result.runtime.error_type }}
+    </p>
 
-                <pre>{{ result.runtime.message }}</pre>
+    {% if result.runtime.line_number %}
+    <p>
+        <strong>Line:</strong>
+        {{ result.runtime.line_number }}
+    </p>
+    {% endif %}
 
-                {% else %}
+    {% if result.runtime.source_line %}
+    <p>
+        <strong>Source Line:</strong>
+        <code>{{ result.runtime.source_line }}</code>
+    </p>
+    {% endif %}
 
-                <p class="success">
-                    ✅ Code executed successfully.
-                </p>
+    {% if result.runtime.explanation %}
 
-                {% endif %}
+    <div class="issue-section">
 
+        <h4>
+            {{ result.runtime.explanation.title }}
+        </h4>
 
-                {% if result.runtime.output %}
+        <p>
+            <strong>Description:</strong>
+            {{ result.runtime.explanation.description }}
+        </p>
 
-                <h4>Program Output</h4>
-
-                <pre>{{ result.runtime.output }}</pre>
-
-                {% endif %}
-
-            </div>
-
-        </div>
-
-        {% endif %}
+        <p>
+            <strong>Suggested Fix:</strong>
+            {{ result.runtime.explanation.suggestion }}
+        </p>
 
     </div>
+
+    {% endif %}
+
+    <details>
+        <summary>View Technical Error Details</summary>
+        <pre>{{ result.runtime.message }}</pre>
+    </details>
+
+    {% else %}
+
+    <p class="success">
+        ✅ Code executed successfully.
+    </p>
+
+    {% endif %}
+
+
+       {% if result.runtime.output %}
+
+    <h4>Program Output</h4>
+
+    <pre>{{ result.runtime.output }}</pre>
+
+    {% endif %}
+
+</div>
+
+{% endif %}
+
+
+</div>
 
 
     <script>
