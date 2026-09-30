@@ -7,6 +7,7 @@ from analyzers.static_analyzer import find_dangerous_eval
 from analyzers.static_analyzer import find_division_by_zero
 from analyzers.static_analyzer import find_unreachable_code
 from analyzers.static_analyzer import find_none_comparison
+from analyzers.static_analyzer import find_debug_prints
 
 def test_unused_variable():
     code = """
@@ -248,3 +249,13 @@ if value is None:
     result = find_none_comparison(code)
 
     assert len(result) == 0
+def test_debug_print():
+    code = """
+x = 10
+print(x)
+"""
+
+    result = find_debug_prints(code)
+
+    assert len(result) == 1
+    assert result[0]["line"] == 3

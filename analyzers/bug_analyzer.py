@@ -9,7 +9,8 @@ from analyzers.static_analyzer import (
     find_dangerous_eval,
     find_division_by_zero,
     find_unreachable_code,
-    find_none_comparison
+    find_none_comparison,
+    find_debug_prints
 )
 from analyzers.runtime_analyzer import analyze_runtime
 from analyzers.explanation_engine import get_explanation
@@ -41,7 +42,8 @@ def analyze_code(code):
         "dangerous_eval": find_dangerous_eval(code),
         "division_by_zero": find_division_by_zero(code),
         "unreachable_code": find_unreachable_code(code),
-        "none_comparison": find_none_comparison(code)
+        "none_comparison": find_none_comparison(code),
+        "debug_prints": find_debug_prints(code)
     }
 
     # Add findings and explanations

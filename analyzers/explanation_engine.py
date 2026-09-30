@@ -66,7 +66,12 @@ EXPLANATIONS = {
     "title": "None Comparison",
     "description": "The code compares a value with None using == or != instead of the identity operators is or is not.",
     "suggestion": "Use 'is None' or 'is not None' when checking whether a value is None."
-    }
+    },
+    "debug_prints": {
+        "title": "Debug Print Statement",
+        "description": "A print() statement was detected and may have been left in the code for debugging purposes.",
+        "suggestion": "Remove unnecessary print() statements or replace them with proper logging before deploying the application."
+    },
 }
 
 

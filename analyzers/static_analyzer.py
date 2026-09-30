@@ -249,3 +249,19 @@ def find_none_comparison(code):
                         })
 
     return none_comparisons
+def find_debug_prints(code):
+    tree = ast.parse(code)
+
+    debug_prints = []
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            if (
+                isinstance(node.func, ast.Name)
+                and node.func.id == "print"
+            ):
+                debug_prints.append({
+                    "line": node.lineno
+                })
+
+    return debug_prints
