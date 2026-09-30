@@ -5,6 +5,12 @@ import os
 import re
 
 
+RUNTIME_ERROR_MAPPING = {
+    "ZeroDivisionError": "zero_division_error",
+    "NameError": "name_error"
+}
+
+
 def analyze_runtime(code):
     temp_file = None
 
@@ -29,6 +35,7 @@ def analyze_runtime(code):
             return {
                 "has_error": False,
                 "error_type": None,
+                "issue_type": None,
                 "message": "Code executed successfully.",
                 "output": result.stdout,
                 "line_number": None,
@@ -54,6 +61,12 @@ def analyze_runtime(code):
             last_line = error_lines[-1]
             error_type = last_line.split(":")[0]
 
+        # Map Python error type to BugLens issue type
+        issue_type = RUNTIME_ERROR_MAPPING.get(
+            error_type,
+            "runtime_error"
+        )
+
         # Get the source line that caused the error
         source_line = None
 
@@ -66,6 +79,7 @@ def analyze_runtime(code):
         return {
             "has_error": True,
             "error_type": error_type,
+            "issue_type": issue_type,
             "message": error_message,
             "output": result.stdout,
             "line_number": line_number,
@@ -76,6 +90,7 @@ def analyze_runtime(code):
         return {
             "has_error": True,
             "error_type": "TimeoutError",
+            "issue_type": "timeout_error",
             "message": "Code execution exceeded the 5-second limit.",
             "output": "",
             "line_number": None,

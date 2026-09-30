@@ -40,6 +40,17 @@ EXPLANATIONS = {
         "description": "The code attempts to divide, floor-divide, or take modulo by zero.",
         "suggestion": "Check that the divisor is not zero before performing the operation."
     },
+        "zero_division_error": {
+        "title": "Zero Division Error",
+        "description": "The program attempted to divide a number by zero during execution.",
+        "suggestion": "Check that the divisor is not zero before performing the division."
+    },
+
+    "name_error": {
+        "title": "Undefined Variable at Runtime",
+        "description": "The program attempted to use a variable or name that Python could not find during execution.",
+        "suggestion": "Make sure the variable is defined before use and check for spelling mistakes."
+    },
 
     "unreachable_code": {
         "title": "Unreachable Code",

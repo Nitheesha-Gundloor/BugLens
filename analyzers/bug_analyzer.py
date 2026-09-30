@@ -60,6 +60,16 @@ def analyze_code(code):
     result["summary"]["total_static_issues"] = total_static_issues
 
     # Run code for runtime analysis
-    result["runtime"] = analyze_runtime(code)
+    # Run code for runtime analysis
+    runtime_result = analyze_runtime(code)
 
+# Add explanation for runtime errors
+    if runtime_result["has_error"]:
+        runtime_result["explanation"] = get_explanation(
+        runtime_result["issue_type"]
+    )
+    else:
+        runtime_result["explanation"] = None
+
+    result["runtime"] = runtime_result
     return result

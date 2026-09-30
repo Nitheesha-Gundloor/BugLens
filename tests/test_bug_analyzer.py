@@ -60,3 +60,22 @@ if value == None:
     assert result["syntax"]["has_error"] is False
     assert len(result["static"]["none_comparison"]["findings"]) == 1
     assert result["static"]["none_comparison"]["explanation"]["title"] == "None Comparison"
+
+def test_runtime_error_explanation():
+    code = """
+x = 10
+y = 0
+print(x / y)
+"""
+
+    result = analyze_code(code)
+
+    assert result["runtime"]["has_error"] is True
+    assert result["runtime"]["error_type"] == "ZeroDivisionError"
+    assert result["runtime"]["issue_type"] == "zero_division_error"
+    assert result["runtime"]["line_number"] == 4
+    assert result["runtime"]["source_line"] == "print(x / y)"
+
+    assert result["runtime"]["explanation"]["title"] == "Zero Division Error"
+    assert "divide" in result["runtime"]["explanation"]["description"]
+    assert "divisor" in result["runtime"]["explanation"]["suggestion"]

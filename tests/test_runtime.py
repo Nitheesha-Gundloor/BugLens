@@ -11,6 +11,7 @@ print(x)
 
     assert result["has_error"] is False
     assert result["error_type"] is None
+    assert result["issue_type"] is None
     assert "10" in result["output"]
 
 
@@ -25,6 +26,8 @@ print(x / y)
 
     assert result["has_error"] is True
     assert result["error_type"] == "ZeroDivisionError"
+    assert result["issue_type"] == "zero_division_error"
+
 
 def test_runtime_error_location():
     code = """
@@ -37,9 +40,9 @@ print(x / y)
 
     assert result["has_error"] is True
     assert result["error_type"] == "ZeroDivisionError"
+    assert result["issue_type"] == "zero_division_error"
     assert result["line_number"] == 4
     assert result["source_line"] == "print(x / y)"
-
 
 
 def test_timeout():
@@ -52,3 +55,4 @@ while True:
 
     assert result["has_error"] is True
     assert result["error_type"] == "TimeoutError"
+    assert result["issue_type"] == "timeout_error"
