@@ -14,6 +14,7 @@ from analyzers.static_analyzer import (
 )
 from analyzers.runtime_analyzer import analyze_runtime
 from analyzers.explanation_engine import get_explanation
+from analyzers.ai_analyzer import analyze_with_ai
 
 
 def analyze_code(code):
@@ -23,6 +24,7 @@ def analyze_code(code):
         "ast": analyze_ast(code),
         "static": {},
         "runtime": None,
+        "ai_analysis": None,
         "summary": {
             "total_static_issues": 0
         }
@@ -62,16 +64,37 @@ def analyze_code(code):
     result["summary"]["total_static_issues"] = total_static_issues
 
     # Run code for runtime analysis
-    # Run code for runtime analysis
     runtime_result = analyze_runtime(code)
 
-# Add explanation for runtime errors
+    # Add explanation for runtime errors
     if runtime_result["has_error"]:
         runtime_result["explanation"] = get_explanation(
-        runtime_result["issue_type"]
-    )
+            runtime_result["issue_type"]
+        )
     else:
         runtime_result["explanation"] = None
 
     result["runtime"] = runtime_result
+
+    # Prepare detected issues for AI analysis
+    detected_issues = {}
+
+    for issue_type, issue_data in result["static"].items():
+        if issue_data["findings"]:
+            detected_issues[issue_type] = issue_data["findings"]
+
+    if runtime_result["has_error"]:
+        detected_issues["runtime_error"] = {
+            "error_type": runtime_result["error_type"],
+            "line_number": runtime_result["line_number"],
+            "source_line": runtime_result["source_line"]
+        }
+
+    # Run AI analysis when issues are detected
+    if detected_issues:
+        result["ai_analysis"] = analyze_with_ai(
+            code,
+            detected_issues
+        )
+
     return result

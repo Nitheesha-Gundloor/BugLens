@@ -174,7 +174,9 @@
                     <strong>AST Nodes:</strong>
                     {{ result.ast.node_count }}
                 </p>
-                <p><strong>Functions:</strong>
+
+                <p>
+                    <strong>Functions:</strong>
                     {{ result.ast.functions | join(', ') if result.ast.functions else 'None detected' }}
                 </p>
 
@@ -256,81 +258,163 @@
 
             </div>
 
+
             <!-- Runtime Analysis -->
-<div class="result-card">
+            <div class="result-card">
 
-    <h3>4. Runtime Analysis</h3>
+                <h3>4. Runtime Analysis</h3>
 
-    {% if result.runtime.has_error %}
+                {% if result.runtime.has_error %}
 
-    <p class="error">
-        ❌ {{ result.runtime.error_type }}
-    </p>
+                <p class="error">
+                    ❌ {{ result.runtime.error_type }}
+                </p>
 
-    {% if result.runtime.line_number %}
-    <p>
-        <strong>Line:</strong>
-        {{ result.runtime.line_number }}
-    </p>
-    {% endif %}
+                {% if result.runtime.line_number %}
+                <p>
+                    <strong>Line:</strong>
+                    {{ result.runtime.line_number }}
+                </p>
+                {% endif %}
 
-    {% if result.runtime.source_line %}
-    <p>
-        <strong>Source Line:</strong>
-        <code>{{ result.runtime.source_line }}</code>
-    </p>
-    {% endif %}
+                {% if result.runtime.source_line %}
+                <p>
+                    <strong>Source Line:</strong>
+                    <code>{{ result.runtime.source_line }}</code>
+                </p>
+                {% endif %}
 
-    {% if result.runtime.explanation %}
+                {% if result.runtime.explanation %}
 
-    <div class="issue-section">
+                <div class="issue-section">
 
-        <h4>
-            {{ result.runtime.explanation.title }}
-        </h4>
+                    <h4>
+                        {{ result.runtime.explanation.title }}
+                    </h4>
 
-        <p>
-            <strong>Description:</strong>
-            {{ result.runtime.explanation.description }}
-        </p>
+                    <p>
+                        <strong>Description:</strong>
+                        {{ result.runtime.explanation.description }}
+                    </p>
 
-        <p>
-            <strong>Suggested Fix:</strong>
-            {{ result.runtime.explanation.suggestion }}
-        </p>
+                    <p>
+                        <strong>Suggested Fix:</strong>
+                        {{ result.runtime.explanation.suggestion }}
+                    </p>
 
-    </div>
+                </div>
 
-    {% endif %}
+                {% endif %}
 
-    <details>
-        <summary>View Technical Error Details</summary>
-        <pre>{{ result.runtime.message }}</pre>
-    </details>
+                <details>
+                    <summary>View Technical Error Details</summary>
+                    <pre>{{ result.runtime.message }}</pre>
+                </details>
 
-    {% else %}
+                {% else %}
 
-    <p class="success">
-        ✅ Code executed successfully.
-    </p>
+                <p class="success">
+                    ✅ Code executed successfully.
+                </p>
 
-    {% endif %}
-
-
-       {% if result.runtime.output %}
-
-    <h4>Program Output</h4>
-
-    <pre>{{ result.runtime.output }}</pre>
-
-    {% endif %}
-
-</div>
-
-{% endif %}
+                {% endif %}
 
 
-</div>
+                {% if result.runtime.output %}
+
+                <h4>Program Output</h4>
+
+                <pre>{{ result.runtime.output }}</pre>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- AI Analysis -->
+            {% if result.ai_analysis and result.ai_analysis.success %}
+
+            <div class="result-card">
+
+                <h3>5. AI Analysis</h3>
+
+                <div class="issue-section">
+
+                    <h4>🤖 AI Explanation</h4>
+
+                    <p>
+                        {{ result.ai_analysis.explanation }}
+                    </p>
+
+                </div>
+
+
+                <div class="issue-section">
+
+                    <h4>Why It Happens</h4>
+
+                    <p>
+                        {{ result.ai_analysis.why_it_happens }}
+                    </p>
+
+                </div>
+
+
+                <div class="issue-section">
+
+                    <h4>Suggested Fix</h4>
+
+                    <p>
+                        {{ result.ai_analysis.suggested_fix }}
+                    </p>
+
+                </div>
+
+
+                <div class="issue-section">
+
+                    <h4>Corrected Code</h4>
+
+                    <pre><code>{{ result.ai_analysis.corrected_code }}</code></pre>
+
+                </div>
+
+
+                <div class="issue-section">
+
+                    <h4>Changes Made</h4>
+
+                    <ul>
+                        {% for change in result.ai_analysis.changes_made %}
+                        <li>{{ change }}</li>
+                        {% endfor %}
+                    </ul>
+
+                </div>
+
+            </div>
+
+            {% elif result.ai_analysis and not result.ai_analysis.success %}
+
+            <div class="result-card">
+
+                <h3>5. AI Analysis</h3>
+
+                <p class="error">
+                    ❌ AI analysis could not be completed.
+                </p>
+
+                <p>
+                    {{ result.ai_analysis.error }}
+                </p>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+        {% endif %}
 
 
     <script>
